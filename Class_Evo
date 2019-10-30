@@ -8,6 +8,7 @@ class Node:
         get_chromosomes = Node.find_chromosomes(self, self.state)
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
+        get_adjacencies = Extremities_and_adjacencies()
 
     def find_next_extremity(self, current, next_extremity):
         if current[0] == next_extremity:
@@ -127,6 +128,7 @@ class Node:
         return linear_chromosomes, circular_chromosomes
 
     def evolve(self, num_inv=0, num_fus=0, num_fis=0, num_b_trl=0, num_u_trl=0, num_trp1=0, num_trp2=0):
+        get_adjacencies = Extremities_and_adjacencies()
         total = num_b_trl+num_fis+num_fus+num_inv+num_trp1+num_trp2+num_u_trl
         inv_n = num_inv
         fus_n = num_fus
@@ -136,17 +138,87 @@ class Node:
         trp1_n = num_trp1
         trp2_n = num_trp2
 
+        operations = ['inv' , 'trp1', 'trp2', 'b_trl', 'u_trl', 'fis', 'fus']
+
         while total > 0:
+            operation = random.choice(operations)
 
-        pass
 
-    def invertion(self):
-        Node.find_chromosomes(self, self.state)
+            if operation == 'inv':
+                if inv_n > 0:
+                   # print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.inversion()
+                    inv_n -=1
+                    total -=1
+                else:
+                    pass
+
+            elif operation == 'trp1':
+                if trp1_n > 0:
+                   # print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.transposition1()
+                    trp1_n-=1
+                    total-=1
+                else:
+                    pass
+
+            elif operation == 'trp2':
+                if trp2_n > 0:
+                  #  print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.transposition2()
+                    trp2_n-=1
+                    total-=1
+                else:
+                    pass
+
+            elif operation == 'b_trl':
+                if b_trl_n > 0:
+                  #  print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.balanced_translocation()
+                    b_trl_n-=1
+                    total-=1
+                else:
+                    pass
+
+            elif operation == 'u_trl':
+                if u_trl_n >0:
+                 #   print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.unbalanced_translocation()
+                    u_trl_n-=1
+                    total-=1
+                else:
+                    pass
+
+            elif operation=='fis':
+                if fis_n >0 :
+                 #   print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.fission()
+                    fis_n-=1
+                    total-=1
+                else:
+                    pass
+
+            elif operation=='fus':
+                if fus_n>0:
+                #    print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
+                    self.fusion()
+                    fus_n-=1
+                    total-=2
+                else:
+                    pass
+
+
+
+    def inversion(self):
+
+        get_adjacencies = Extremities_and_adjacencies()
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes)-1)
-        print('chrm num: ', chrm_num)
-        print('linear chrm: ', self.linear_chromosomes)
+
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
-        print('adjacencies: ', adjacencies)
+
 
         adj1_num = random.randint(0, len(adjacencies)-1)
         adj2_num = random.randint(0, len(adjacencies)-1)
@@ -154,8 +226,7 @@ class Node:
         while adj1_num == adj2_num:
             adj2_num = random.randint(0, len(adjacencies)-1)
 
-        print('adj1 num: ', adj1_num)
-        print('adj2 num: ', adj2_num)
+
 
         adj1 = adjacencies[adj1_num]
         adj2 = adjacencies[adj2_num]
@@ -172,22 +243,76 @@ class Node:
             new_adj2 = (adj2[1], adj1[1])
 
         #perfrom operation
+
         self.state.remove(adj1)
         self.state.remove(adj2)
         self.state.append(new_adj1)
         self.state.append(new_adj2)
+
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
+
+        while len(self.circular_chromosomes) > 0:
+
+            self.state.append(adj1)
+            self.state.append(adj2)
+            self.state.remove(new_adj1)
+            self.state.remove(new_adj2)
+
+            get_chromosomes = Node.find_chromosomes(self, self.state)
+            self.linear_chromosomes = get_chromosomes[0]
+            self.circular_chromosomes = get_chromosomes[1]
+
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+
+            adj1_num = random.randint(0, len(adjacencies) - 1)
+            adj2_num = random.randint(0, len(adjacencies) - 1)
+
+            while adj1_num == adj2_num:
+                adj2_num = random.randint(0, len(adjacencies) - 1)
+
+            adj1 = adjacencies[adj1_num]
+            adj2 = adjacencies[adj2_num]
+
+            if adj1[0] < adj2[0]:
+                new_adj1 = (adj1[0], adj2[0])
+            else:
+                new_adj1 = (adj2[0], adj1[0])
+
+            if adj1[1] < adj2[1]:
+                new_adj2 = (adj1[1], adj2[1])
+            else:
+                new_adj2 = (adj2[1], adj1[1])
+
+            # perfrom operation
+
+            self.state.remove(adj1)
+            self.state.remove(adj2)
+            self.state.append(new_adj1)
+            self.state.append(new_adj2)
+
+            get_chromosomes = Node.find_chromosomes(self, self.state)
+            self.linear_chromosomes = get_chromosomes[0]
+            self.circular_chromosomes = get_chromosomes[1]
+
+
+        print('inversion:   ', get_adjacencies.adjacencies_to_genome(self.state))
 
     def transposition1(self):
         get_adjacencies = Extremities_and_adjacencies()
 
         # exsision and circularization
 
-        Node.find_chromosomes(self, self.state)
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
-        print('chrm num: ', chrm_num)
-        print('linear chrm: ', self.linear_chromosomes)
+
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
-        print('adjacencies: ', adjacencies)
+
 
         adj1_num = random.randint(0, len(adjacencies) - 1)
         adj2_num = random.randint(0, len(adjacencies) - 1)
@@ -195,8 +320,6 @@ class Node:
         while adj1_num == adj2_num:
             adj2_num = random.randint(0, len(adjacencies) - 1)
 
-        print('adj1 num: ', adj1_num)
-        print('adj2 num: ', adj2_num)
 
         adj1 = adjacencies[adj1_num]
         adj2 = adjacencies[adj2_num]
@@ -223,7 +346,7 @@ class Node:
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
 
-        print(new_adj1, new_adj2)
+        print(self.circular_chromosomes)
         if new_adj1 in self.circular_chromosomes[0]:
             join = new_adj1
             excision = new_adj2
@@ -233,7 +356,7 @@ class Node:
 
 
 
-        print('state 1: ',get_adjacencies.adjacencies_to_genome(self.state))
+        print('trp0:   ',get_adjacencies.adjacencies_to_genome(self.state))
 
         #decircularization and reinsertion
 
@@ -265,12 +388,16 @@ class Node:
         self.state.append(new_adj1)
         self.state.append(new_adj2)
 
+        print('trp1:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
     def transposition2(self):
         get_adjacencies = Extremities_and_adjacencies()
 
         # exsision and circularization
 
-        Node.find_chromosomes(self, self.state)
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
 
@@ -328,6 +455,7 @@ class Node:
         get_chromosomes = Node.find_chromosomes(self, self.state)
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
+        print(self.circular_chromosomes)
 
         if new_adj1 in self.circular_chromosomes[0]:
             join = new_adj1
@@ -336,7 +464,7 @@ class Node:
             join = new_adj2
             excision = new_adj1
 
-        print('state 1: ', get_adjacencies.adjacencies_to_genome(self.state))
+        print('trp0:   ',get_adjacencies.adjacencies_to_genome(self.state))
 
         # decircularization and reinsertion
 
@@ -344,7 +472,7 @@ class Node:
         adj1 = self.circular_chromosomes[0][adj1_num]
 
         while adj1 == join:
-            adj1_num = random.randint(0, len(self.circular_chromosomes[0]))
+            adj1_num = random.randint(0, len(self.circular_chromosomes[0])-1)
             adj1 = self.circular_chromosomes[0][adj1_num]
 
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
@@ -373,9 +501,13 @@ class Node:
         self.state.remove(adj2)
         self.state.append(new_adj1)
         self.state.append(new_adj2)
+        print('trp2:   ', get_adjacencies.adjacencies_to_genome(self.state))
 
     def balanced_translocation(self):
-        Node.find_chromosomes(self, self.state)
+        get_adjacencies = Extremities_and_adjacencies()
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
         chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
         while chrm_num_1==chrm_num_2:
@@ -405,9 +537,14 @@ class Node:
         self.state.append(new_adj1)
         self.state.append(new_adj2)
 
+        print('balanced translocation:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
 
     def unbalanced_translocation(self):
-        Node.find_chromosomes(self, self.state)
+        get_adjacencies = Extremities_and_adjacencies()
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
         chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
         while chrm_num_1==chrm_num_2:
@@ -433,10 +570,20 @@ class Node:
         self.state.append(new_adj1)
         self.state.append(adj1[1])
 
+        print('unbaanced translocation:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
     def fission(self):
-        Node.find_chromosomes(self, self.state)
+        get_adjacencies = Extremities_and_adjacencies()
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+
+        while len(adjacencies) == 0:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+
         adj_num = random.randint(0, len(adjacencies) - 1)
 
         adj = adjacencies[adj_num]
@@ -445,8 +592,13 @@ class Node:
         self.state.append(adj[0])
         self.state.append(adj[1])
 
+        print('fission:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
     def fusion(self):
-        Node.find_chromosomes(self, self.state)
+        get_adjacencies = Extremities_and_adjacencies()
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
         chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
         chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
         while chrm_num_1 == chrm_num_2:
@@ -469,6 +621,8 @@ class Node:
         self.state.remove(telo1)
         self.state.remove(telo2)
         self.state.append(new_adj)
+
+        print('fusion:   ', get_adjacencies.adjacencies_to_genome(self.state))
 
 
 
