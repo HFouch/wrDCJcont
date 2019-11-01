@@ -415,6 +415,7 @@ class Node:
         linear_chromosomes = self.find_chromosomes(self.state)[0]
         operation_type = None
 
+
         for chromosome in linear_chromosomes:
             if operation[0][0] in chromosome:
                 test_chromosome = chromosome
@@ -710,11 +711,6 @@ class Node:
 
     def get_decircularization_operation(self, adjacenciesB):
 
-
-        print('self.state: ', self.state)
-        print('this is happening')
-        print(self.circular_chromosomes)
-
         # !! Note that you are now assuming there is only one possible decircularization and reinsertion operation
         operations = []
         adjacenciesA = self.state
@@ -780,7 +776,7 @@ class Node:
                                     op_2 = (op_2_2, op_2_1)
                                 ordered_operation = (op_1, op_2)
 
-                                print('the ilegal operation: ', ordered_operation)
+
 
                                 return ordered_operation
 
@@ -797,7 +793,7 @@ class Node:
                                     op_2_1 = (q, p)
                                 op_2 = (op_2_1, u_not_p)
                                 ordered_operation = ((u, v), op_2)
-                                print('the ilegal operation: ', ordered_operation)
+
 
                                 return ordered_operation
 
@@ -818,7 +814,7 @@ class Node:
                                     op_2_1 = (q, p)
 
                                 ordered_operation = ((v, u), (op_2_1, v_not_q))
-                                print('the ilegal operation: ', ordered_operation)
+
 
                                 return ordered_operation
 
@@ -833,17 +829,19 @@ class Node:
                                     ordered_operation = (u, v, op_2)
                                 else:
                                     ordered_operation = (v, u, op_2)
-                                print('the ilegal operation: ', ordered_operation)
+
 
                                 return ordered_operation
 
     def get_illegal_decircularization_operation(self, adjacenciesB):
 
-        operations = self.get_legal_operations(adjacenciesB)
+        operations = [operation for operation in self.get_legal_operations(adjacenciesB) if len(operation)==4]
+
 
         decircularization_operations = []
 
         for operation in operations:
+
 
             if operation[0][0] in self.circular_chromosomes[0] or operation[0][1] in self.circular_chromosomes[0]:
                 decircularization_operations.append(operation)
