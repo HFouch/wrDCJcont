@@ -203,7 +203,7 @@ class Node:
                 #    print('current state = ', get_adjacencies.adjacencies_to_genome(self.state))
                     self.fusion()
                     fus_n-=1
-                    total-=2
+                    total-=1
                 else:
                     pass
 
@@ -216,6 +216,10 @@ class Node:
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes)-1)
+
+        # if it is a single gene or two gene chromosome, choose another one
+        while len(self.linear_chromosomes[chrm_num]) < 4:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
 
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
 
@@ -265,7 +269,8 @@ class Node:
             self.circular_chromosomes = get_chromosomes[1]
 
             chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
-
+            while len(self.linear_chromosomes[chrm_num]) < 4:
+                chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
             adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
 
             adj1_num = random.randint(0, len(adjacencies) - 1)
@@ -311,7 +316,14 @@ class Node:
         self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
 
+        #if it is a single gene or two gene chromosome, choose another one
+        while len(self.linear_chromosomes[chrm_num]) < 4:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        #if there is only one adjacency
+
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+
 
 
         adj1_num = random.randint(0, len(adjacencies) - 1)
@@ -335,7 +347,6 @@ class Node:
         else:
             new_adj2 = (adj2[0], adj1[1])
 
-
         # perfrom operation
         self.state.remove(adj1)
         self.state.remove(adj2)
@@ -346,7 +357,33 @@ class Node:
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
 
-        print(self.circular_chromosomes)
+        if len(self.circular_chromosomes) == 0:
+            self.state.append(adj1)
+            self.state.append(adj2)
+            self.state.remove(new_adj1)
+            self.state.remove(new_adj2)
+
+            if adj1[0] < adj2[0]:
+                new_adj1 = (adj1[0], adj2[0])
+            else:
+                new_adj1 = (adj2[0], adj1[0])
+
+            if adj1[1] < adj2[1]:
+                new_adj2 = (adj1[1], adj2[1])
+            else:
+                new_adj2 = (adj2[1], adj1[1])
+
+            self.state.remove(adj1)
+            self.state.remove(adj2)
+            self.state.append(new_adj1)
+            self.state.append(new_adj2)
+
+            get_chromosomes = Node.find_chromosomes(self, self.state)
+            self.linear_chromosomes = get_chromosomes[0]
+            self.circular_chromosomes = get_chromosomes[1]
+
+
+
         if new_adj1 in self.circular_chromosomes[0]:
             join = new_adj1
             excision = new_adj2
@@ -362,15 +399,164 @@ class Node:
 
         adj1 = join
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
-        adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
-        adj2_num = random.randint(0, len(adjacencies) - 1)
-        adj2 = adjacencies[adj2_num]
-
-        while adj2 == excision:
+        #if it is a single gene chromosome, choose another chromosome
+        while len(self.linear_chromosomes[chrm_num]) == 2:
             chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        if len(self.linear_chromosomes[chrm_num]) == 3:
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+            adj2 = adjacencies[0]
+
+        else:
             adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
             adj2_num = random.randint(0, len(adjacencies) - 1)
             adj2 = adjacencies[adj2_num]
+
+        while adj2 == excision:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+            # if it is a single gene chromosome, choose another chromosome
+            while len(self.linear_chromosomes[chrm_num]) == 2:
+                chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+            if len(self.linear_chromosomes[chrm_num]) == 3:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2 = adjacencies[0]
+
+            else:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2_num = random.randint(0, len(adjacencies) - 1)
+                adj2 = adjacencies[adj2_num]
+
+        if adj1[0] < adj2[1]:
+            new_adj1 = (adj1[0], adj2[1])
+        else:
+            new_adj1 = (adj2[1], adj1[0])
+
+        if adj1[1] < adj2[0]:
+            new_adj2 = (adj1[1], adj2[0])
+        else:
+            new_adj2 = (adj2[0], adj1[1])
+
+        # perfrom operation
+        self.state.remove(adj1)
+        self.state.remove(adj2)
+        self.state.append(new_adj1)
+        self.state.append(new_adj2)
+
+        print('trp1:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
+    def trp2(self):
+        get_adjacencies = Extremities_and_adjacencies()
+
+        # exsision and circularization
+
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
+        chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        # if it is a single gene or two gene chromosome, choose another one
+        while len(self.linear_chromosomes[chrm_num]) < 4:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        # if there is only one adjacency
+
+        adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+
+        adj1_num = random.randint(0, len(adjacencies) - 1)
+        adj2_num = random.randint(0, len(adjacencies) - 1)
+
+        while adj1_num == adj2_num:
+            adj2_num = random.randint(0, len(adjacencies) - 1)
+
+        adj1 = adjacencies[adj1_num]
+        adj2 = adjacencies[adj2_num]
+
+        if adj1[0] < adj2[1]:
+            new_adj1 = (adj1[0], adj2[1])
+        else:
+            new_adj1 = (adj2[1], adj1[0])
+
+        if adj1[1] < adj2[0]:
+            new_adj2 = (adj1[1], adj2[0])
+        else:
+            new_adj2 = (adj2[0], adj1[1])
+
+        # perfrom operation
+        self.state.remove(adj1)
+        self.state.remove(adj2)
+        self.state.append(new_adj1)
+        self.state.append(new_adj2)
+
+        get_chromosomes = Node.find_chromosomes(self, self.state)
+        self.linear_chromosomes = get_chromosomes[0]
+        self.circular_chromosomes = get_chromosomes[1]
+
+        if len(self.circular_chromosomes) == 0:
+            self.state.append(adj1)
+            self.state.append(adj2)
+            self.state.remove(new_adj1)
+            self.state.remove(new_adj2)
+
+            if adj1[0] < adj2[0]:
+                new_adj1 = (adj1[0], adj2[0])
+            else:
+                new_adj1 = (adj2[0], adj1[0])
+
+            if adj1[1] < adj2[1]:
+                new_adj2 = (adj1[1], adj2[1])
+            else:
+                new_adj2 = (adj2[1], adj1[1])
+
+            self.state.remove(adj1)
+            self.state.remove(adj2)
+            self.state.append(new_adj1)
+            self.state.append(new_adj2)
+
+            get_chromosomes = Node.find_chromosomes(self, self.state)
+            self.linear_chromosomes = get_chromosomes[0]
+            self.circular_chromosomes = get_chromosomes[1]
+
+        if new_adj1 in self.circular_chromosomes[0]:
+            join = new_adj1
+            excision = new_adj2
+        else:
+            join = new_adj2
+            excision = new_adj1
+
+        print('trp0:   ', get_adjacencies.adjacencies_to_genome(self.state))
+
+        # decircularization and reinsertion
+
+        adj1 = join
+        chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+        # if it is a single gene chromosome, choose another chromosome
+        while len(self.linear_chromosomes[chrm_num]) == 2:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        if len(self.linear_chromosomes[chrm_num]) == 3:
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+            adj2 = adjacencies[0]
+
+        else:
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+            adj2_num = random.randint(0, len(adjacencies) - 1)
+            adj2 = adjacencies[adj2_num]
+
+        while adj2 == excision:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+            # if it is a single gene chromosome, choose another chromosome
+            while len(self.linear_chromosomes[chrm_num]) == 2:
+                chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+            if len(self.linear_chromosomes[chrm_num]) == 3:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2 = adjacencies[0]
+
+            else:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2_num = random.randint(0, len(adjacencies) - 1)
+                adj2 = adjacencies[adj2_num]
 
         if adj1[0] < adj2[1]:
             new_adj1 = (adj1[0], adj2[1])
@@ -399,12 +585,23 @@ class Node:
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        # if it is a single gene or two gene chromosome, choose another one
+        while len(self.linear_chromosomes[chrm_num]) < 6:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+
         adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
 
         adj1_num = random.randint(0, len(adjacencies) - 1)
         adj2_num = random.randint(0, len(adjacencies) - 1)
 
-        while adj1_num == adj2_num:
+
+
+        # To ensure single gene circular chromosomes are not formed because then there is only one adj so cut and not != join
+        while adj1_num == adj2_num or (int(adjacencies[adj2_num][0])) == int(adjacencies[adj1_num][0]) or (
+        int(adjacencies[adj2_num][0])) == int(adjacencies[adj1_num][1]) or (int(adjacencies[adj2_num][1])) == int(
+                adjacencies[adj1_num][0]) or (int(adjacencies[adj2_num][1])) == int(adjacencies[adj1_num][1]):
             adj2_num = random.randint(0, len(adjacencies) - 1)
 
         adj1 = adjacencies[adj1_num]
@@ -420,32 +617,6 @@ class Node:
         else:
             new_adj2 = (adj2[0], adj1[1])
 
-        # single gene chromosomes are not permitted as cut=join
-        while int(new_adj1[0])==int(new_adj1[1]) or int(new_adj2[0])==int(new_adj2[1]):
-
-            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
-
-            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
-
-            adj1_num = random.randint(0, len(adjacencies) - 1)
-            adj2_num = random.randint(0, len(adjacencies) - 1)
-
-            while adj1_num == adj2_num:
-                adj2_num = random.randint(0, len(adjacencies) - 1)
-
-            adj1 = adjacencies[adj1_num]
-            adj2 = adjacencies[adj2_num]
-
-            if adj1[0] < adj2[1]:
-                new_adj1 = (adj1[0], adj2[1])
-            else:
-                new_adj1 = (adj2[1], adj1[0])
-
-            if adj1[1] < adj2[0]:
-                new_adj2 = (adj1[1], adj2[0])
-            else:
-                new_adj2 = (adj2[0], adj1[1])
-
         # perfrom operation
         self.state.remove(adj1)
         self.state.remove(adj2)
@@ -455,7 +626,39 @@ class Node:
         get_chromosomes = Node.find_chromosomes(self, self.state)
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
-        print(self.circular_chromosomes)
+
+
+
+
+        # if the above does not result in the formation of a cicular chromosome join the adjacencies differently
+        # NTS you can actually take the above out and just start with this while loop...
+        while len(self.circular_chromosomes) == 0 :
+            self.state.append(adj1)
+            self.state.append(adj2)
+            self.state.remove(new_adj1)
+            self.state.remove(new_adj2)
+
+            if adj1[0] < adj2[0]:
+                new_adj1 = (adj1[0], adj2[0])
+            else:
+                new_adj1 = (adj2[0], adj1[0])
+
+            if adj1[1] < adj2[1]:
+                new_adj2 = (adj1[1], adj2[1])
+            else:
+                new_adj2 = (adj2[1], adj1[1])
+
+            self.state.remove(adj1)
+            self.state.remove(adj2)
+            self.state.append(new_adj1)
+            self.state.append(new_adj2)
+
+            get_chromosomes = Node.find_chromosomes(self, self.state)
+            self.linear_chromosomes = get_chromosomes[0]
+            self.circular_chromosomes = get_chromosomes[1]
+
+
+
 
         if new_adj1 in self.circular_chromosomes[0]:
             join = new_adj1
@@ -476,15 +679,33 @@ class Node:
             adj1 = self.circular_chromosomes[0][adj1_num]
 
         chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
-        adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
-        adj2_num = random.randint(0, len(adjacencies) - 1)
-        adj2 = adjacencies[adj2_num]
 
-        while adj2 == excision:
+        while len(self.linear_chromosomes[chrm_num]) == 2:
             chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        if len(self.linear_chromosomes[chrm_num]) == 3:
+            adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+            adj2 = adjacencies[0]
+
+        else:
             adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
             adj2_num = random.randint(0, len(adjacencies) - 1)
             adj2 = adjacencies[adj2_num]
+
+        while adj2 == excision:
+            chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+            # if it is a single gene chromosome, choose another chromosome
+            while len(self.linear_chromosomes[chrm_num]) == 2:
+                chrm_num = random.randint(0, len(self.linear_chromosomes) - 1)
+
+            if len(self.linear_chromosomes[chrm_num]) == 3:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2 = adjacencies[0]
+
+            else:
+                adjacencies = [element for element in self.linear_chromosomes[chrm_num] if type(element) is tuple]
+                adj2_num = random.randint(0, len(adjacencies) - 1)
+                adj2 = adjacencies[adj2_num]
 
         if adj1[0] < adj2[1]:
             new_adj1 = (adj1[0], adj2[1])
@@ -509,8 +730,12 @@ class Node:
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
         chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        while len(self.linear_chromosomes[chrm_num_1]) < 3:
+            chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
+
         chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
-        while chrm_num_1==chrm_num_2:
+        while chrm_num_1==chrm_num_2 or len(self.linear_chromosomes[chrm_num_2]) < 3:
             chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
 
         adjacencies_chrm1 = [element for element in self.linear_chromosomes[chrm_num_1] if type(element) is tuple]
@@ -545,10 +770,17 @@ class Node:
         get_chromosomes = Node.find_chromosomes(self, self.state)
         self.linear_chromosomes = get_chromosomes[0]
         self.circular_chromosomes = get_chromosomes[1]
+
         chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
+
+        # chromosome 1 should not be a single gene chromosome otherwise the operation would amount to a fusion
+        while len(self.linear_chromosomes[chrm_num_1]) < 3:
+            chrm_num_1 = random.randint(0, len(self.linear_chromosomes) - 1)
+
         chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
         while chrm_num_1==chrm_num_2:
             chrm_num_2 = random.randint(0, len(self.linear_chromosomes) - 1)
+
 
         adjacencies_chrm1 = [element for element in self.linear_chromosomes[chrm_num_1] if type(element) is tuple]
         telomeres_chrm2 = [element for element in self.linear_chromosomes[chrm_num_2] if type(element) is not tuple]
