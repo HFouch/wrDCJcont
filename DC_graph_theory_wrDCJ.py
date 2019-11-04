@@ -26,8 +26,14 @@ from Class_GraphTheory_weighted import GraphTheory
 #genomeA = [[1,-3,-2,4,5,6,7]]
 #genomeB = [[1,2,3,4,5,6,7,8, 9, 10]]
 
-genomeA = [[1, 2, 3, 4, -16, -15, 5, 7], [8, 6, -9, -11, 14, 10, 12], [13, 17]]
-genomeB = [[1, 2,3,4, 5,6,7],[8,9, 10, 11, 12], [13, 14, 15,16, 17]]
+#genomeA =[[-7, 16, -6], [-12, -11, -10, -9, -8, 1, 2, -3, 4, 5, -13], [-17, -15, -14]]
+
+
+#genomeB = [[1, 2,3,4, 5,6,7],[8,9, 10, 11, 12], [13, 14, 15,16, 17]]
+
+
+genomeA =[[1, 8, -10, -9, -5, -4, 11, 12, -15, -14, -3], [-7, -6, -13], [2]]
+genomeB = [[1, 2,3,4, 5,6,7],[8,9, 10, 11, 12], [13, 14, 15]]
 #from genes to adjacencies
 get_adjacencies = Extremities_and_adjacencies()
 adjacencies_genomeA = get_adjacencies.adjacencies_ordered_and_sorted(genomeA)

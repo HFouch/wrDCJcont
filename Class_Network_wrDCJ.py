@@ -105,14 +105,13 @@ class Network:
                 op_type = operation_result[1]
 
 
-
-
                 check_hash_table = Network.check_hash_key(self, child_state)
 
                 if check_hash_table[0]:
                     child = check_hash_table[1]
                     node.children.append(child)
 
+                    # if the operation is a trp0
                     child.find_chromosomes(child.state)
                     if len(child.circular_chromosomes) != 0 :
                         node.children_weights.append(0.5)
@@ -124,17 +123,43 @@ class Network:
                               get_adjacencies.adjacencies_to_genome(child_state))
 
                     else:
-                        node.children_weights.append(1)
-                        if op_type == 'fis' or op_type == 'fus' or op_type == 'u_trl':
+                        #node.children_weights.append(1)
+                        #if op_type == 'fis' or op_type == 'fus' or op_type == 'u_trl':
+                        #    operation_type = op_type
+                        #else:
+                        #    operation_type = node.find_operation_type(operation)
+
+                        if op_type == 'fis':
                             operation_type = op_type
+                            op_weight = 1
+
+                        elif op_type == 'fus':
+                            operation_type = op_type
+                            op_weight = 1
+
+                        elif op_type == 'u_trl':
+                            operation_type = op_type
+                            op_weight = 1
+
                         else:
                             operation_type = node.find_operation_type(operation)
+                            if operation_type == 'inv':
+                                op_weight = 1
+                            elif operation_type == 'b_trl':
+                                op_weight = 1
+                            else:
+                                print("There's a problem at the .find_optype node function")
+
+                        node.children_weights.append(op_weight)
+
                         node.children_operations.append((operation, operation_type))
                         print()
                         print('Operation: ', operation)
                         print('Type: ', operation_type)
+                        print('weight: ', op_weight)
                         print(get_adjacencies.adjacencies_to_genome(node.state), '  ---->    ',
                               get_adjacencies.adjacencies_to_genome(child_state))
+                        print(node.children_weights)
 
 
 
@@ -194,18 +219,57 @@ class Network:
                         self.hash_table.update({hash_key: child})
                         # print('#T: ', self.hash_table)
                         node.children.append(child)
+
+                        '''
                         if op_type == 'fis' or op_type == 'fus' or op_type == 'u_trl':
                             operation_type = op_type
                         else:
                             operation_type = node.find_operation_type(operation)
+
+                        node.children_weights.append(1)
                         node.children_operations.append((operation, operation_type))
                         print()
                         print('Operation: ', operation)
                         print('Type: ', operation_type)
                         print(get_adjacencies.adjacencies_to_genome(node.state), '  ---->    ',
                               get_adjacencies.adjacencies_to_genome(child_state))
+                        
+                        '''
 
-                        node.children_weights.append(1)
+                        if op_type == 'fis':
+                            operation_type = op_type
+                            op_weight = 1
+
+                        elif op_type == 'fus':
+                            operation_type = op_type
+                            op_weight = 1
+
+                        elif op_type == 'u_trl':
+                            operation_type = op_type
+                            op_weight = 1
+                        else:
+                            operation_type = node.find_operation_type(operation)
+                            if operation_type == 'inv':
+                                op_weight = 1
+                            elif operation_type == 'b_trl':
+                                op_weight = 1
+                            else:
+                                print("There's a problem at the .find_optype node function")
+
+                        node.children_weights.append(op_weight)
+
+                        node.children_operations.append((operation, operation_type))
+                        print()
+                        print('Operation: ', operation)
+                        print('Type: ', operation_type)
+                        print('weight: ', op_weight)
+                        print(get_adjacencies.adjacencies_to_genome(node.state), '  ---->    ',
+                              get_adjacencies.adjacencies_to_genome(child_state))
+                        print(node.children_weights)
+
+
+
+
                         #print('node children: ', node.children)
                         #print('node.children weigths: ', node.children_weights)
                         #print('node.childern_operations: ', node.children_operations)

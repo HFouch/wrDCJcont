@@ -102,6 +102,7 @@ class Extremities_and_adjacencies:
             return next_extremity, chromosome, not_telomeres
 
     def find_chromosomes(self, adjacencies):
+
         telomeres = [element for element in adjacencies if type(element) is not tuple]
         not_telomeres = [element for element in adjacencies if type(element) is tuple]
 
